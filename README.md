@@ -8,7 +8,7 @@ My solutions to [Advent of Code 2024](https://adventofcode.com/2024) challenges.
 | :----: | :----: | :----: | :--------: |
 | Day 1  |  ⭐️   |  ⭐️   |    Rust    |
 | Day 2  |  ⭐️   |  ⭐️   |     C#     |
-| Day 3  |   -    |   -    |    PHP     |
+| Day 3  |  ⭐️   |   -    |    PHP     |
 | Day 4  |   -    |   -    |   Python   |
 | Day 5  |   -    |   -    | TypeScript |
 | Day 6  |   -    |   -    |            |
