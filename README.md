@@ -11,7 +11,7 @@ My solutions to [Advent of Code 2024](https://adventofcode.com/2024) challenges.
 | Day 3  |  ⭐️   |  ⭐️   |    PHP     |
 | Day 4  |  ⭐️   |  ⭐️   |   Python   |
 | Day 5  |  ⭐️   |  ⭐️   | TypeScript |
-| Day 6  |   -    |   -    |            |
+| Day 6  |  ⭐️   |   -    |     Go     |
 | Day 7  |   -    |   -    |            |
 | Day 8  |   -    |   -    |            |
 | Day 9  |   -    |   -    |            |
