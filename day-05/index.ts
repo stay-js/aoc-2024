@@ -16,11 +16,11 @@ function checkValidity(rules: number[][], change: number[]): boolean {
   let valid = true;
 
   for (let i = 0; i < change.length; i++) {
-    const rulesForField = rules.filter((rule) => rule[0] == change[i]);
+    const rulesForField = rules.filter((rule) => rule[0] === change[i]);
 
     rulesForField.forEach((rule) => {
       const index = change.indexOf(rule[1]);
-      if (index != -1 && index < i) valid = false;
+      if (index !== -1 && index < i) valid = false;
     });
   }
 
@@ -43,11 +43,11 @@ function secondPart(input: string): number {
   const fixed = inValid.map((change) => {
     while (!checkValidity(rules, change)) {
       for (let i = 0; i < change.length; i++) {
-        const rulesForField = rules.filter((rule) => rule[0] == change[i]);
+        const rulesForField = rules.filter((rule) => rule[0] === change[i]);
 
         rulesForField.forEach((rule) => {
           const index = change.indexOf(rule[1]);
-          if (index != -1 && index < i) [change[i], change[index]] = [change[index], change[i]];
+          if (index !== -1 && index < i) [change[i], change[index]] = [change[index], change[i]];
         });
       }
     }
