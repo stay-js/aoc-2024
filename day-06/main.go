@@ -5,86 +5,98 @@ import (
 	"strings"
 )
 
-func getStartingPosition(matrix [][]rune) (int, int) {
-  for i, row := range matrix {
-    for j, cell := range row {
-      if cell == '^' {
-        return j, i
-      }
-    }
-  }
+type Position struct {
+	x, y int
+}
 
-  panic("invalid input")
+func getMatrix(fileName string) [][]rune {
+	data, err := os.ReadFile(fileName)
+
+	if err != nil {
+		panic(err)
+	}
+
+	rows := strings.Split(string(data), "\n")
+	matrix := make([][]rune, len(rows))
+
+	for i, row := range rows {
+		matrix[i] = []rune(row)
+	}
+
+	return matrix
+}
+
+func getStartingPosition(matrix [][]rune) (int, int) {
+	for i, row := range matrix {
+		for j, cell := range row {
+			if cell == '^' {
+				return j, i
+			}
+		}
+	}
+  
+	panic("invalid input")
+}
+
+func traverseMatrix(matrix [][]rune, onVisit func(Position, int) bool) {
+	orientations := [][]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	height, width := len(matrix), len(matrix[0])
+
+	x, y := getStartingPosition(matrix)
+	orientation := 0
+
+	for y >= 0 && y < height && x >= 0 && x < width {
+		if !onVisit(Position{x, y}, orientation) {
+			break
+		}
+
+		nextY := y + orientations[orientation][0]
+		nextX := x + orientations[orientation][1]
+
+		if nextY < 0 || nextY >= height || nextX < 0 || nextX >= width {
+			break
+		}
+
+		if matrix[nextY][nextX] == '#' {
+			orientation = (orientation + 1) % 4
+			continue
+		}
+
+		x, y = nextX, nextY
+	}
 }
 
 func firstPart(matrix [][]rune) int {
-  orientations := [][]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	visited := make(map[Position]bool)
 
-  height := len(matrix)
-  width := len(matrix[0])
+	traverseMatrix(matrix, func(pos Position, orientation int) bool {
+		visited[pos] = true
+		return true
+	})
 
-  x, y := getStartingPosition(matrix)
-
-  visited := make(map[[2]int]bool)
-  orientation := 0
-
-  for y >= 0 && y < height && x >= 0 && x < width {
-    visited[[2]int{y, x}] = true 
-
-    nextY := y + orientations[orientation][0]
-    nextX := x + orientations[orientation][1]
-
-    if nextY < 0 || nextY >= height || nextX < 0 || nextX >= width {
-      break
-    }
-
-    if matrix[nextY][nextX] == '#' {
-      orientation = (orientation + 1) % 4
-      continue
-    }
-    
-    x, y = nextX, nextY
-  }
-
-  return len(visited)
+	return len(visited)
 }
 
-
 func secondPart(matrix [][]rune) int {
-	orientations := [][]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	height, width := len(matrix), len(matrix[0])
 
-	height := len(matrix)
-	width := len(matrix[0])
-
-	startX, startY := getStartingPosition(matrix)
-
-	simulate := func(tempMatrix [][]rune) bool {
-		x, y := startX, startY
-
-		orientation := 0
+	isLoop := func(tempMatrix [][]rune) bool {
 		visited := make(map[[3]int]bool)
+		loopDetected := false
 
-		for {
-			if visited[[3]int{y, x, orientation}] {
-				return true 
-			}
+		traverseMatrix(tempMatrix, func(pos Position, orientation int) bool {
+			key := [3]int{pos.y, pos.x, orientation}
 
-			visited[[3]int{y, x, orientation}] = true
-
-			nextY := y + orientations[orientation][0]
-			nextX := x + orientations[orientation][1]
-
-			if nextY < 0 || nextY >= height || nextX < 0 || nextX >= width {
+			if visited[key] {
+				loopDetected = true
 				return false
 			}
 
-			if tempMatrix[nextY][nextX] == '#' {
-				orientation = (orientation + 1) % 4
-				continue
-			}
+			visited[key] = true
+			return true
+		})
 
-			x, y = nextX, nextY
-		}
+		return loopDetected
 	}
 
 	validPositions := 0
@@ -100,7 +112,7 @@ func secondPart(matrix [][]rune) int {
 
 				tempMatrix[i][j] = '#'
 
-				if simulate(tempMatrix) {
+				if isLoop(tempMatrix) {
 					validPositions++
 				}
 			}
@@ -110,33 +122,15 @@ func secondPart(matrix [][]rune) int {
 	return validPositions
 }
 
-func getMatrix(fileName string) [][]rune {
-  data, err := os.ReadFile(fileName)
-    
-  if err != nil {
-    panic(err)
-  }
-
-  rows := strings.Split(string(data), "\n")
-
-  matrix := make([][]rune, len(rows))
-
-  for i, row := range rows {
-    matrix[i] = []rune(row)
-  }
-
-  return matrix
-}
-
 func main() {
-  demoInput := getMatrix("demo-input.txt")
-  input := getMatrix("input.txt")
+	demoInput := getMatrix("demo-input.txt")
+	input := getMatrix("input.txt")
 
-  println("demo-input:")
-  println(firstPart(demoInput))
-  println(secondPart(demoInput))
+	println("demo-input:")
+	println(firstPart(demoInput))
+	println(secondPart(demoInput))
 
-  println("\ninput:")
-  println(firstPart(input))
-  println(secondPart(input))
+	println("\ninput:")
+	println(firstPart(input))
+	println(secondPart(input))
 }
