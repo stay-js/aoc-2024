@@ -24,27 +24,20 @@ fn create_variations(numbers: Vec<u64>, current: Vec<u64>, concat: bool) -> Vec<
 }
 
 fn calculate_total(input: &String, concat: bool) -> u64 {
-    let equations: Vec<(u64, Vec<u64>)> = input
+    return input
         .lines()
         .map(|line| {
             let parts: Vec<&str> = line.split(": ").collect();
 
             let left = parts[0].parse().unwrap();
-            let right = parts[1]
+            let right: Vec<u64> = parts[1]
                 .split(" ")
                 .map(|part| part.parse().unwrap())
                 .collect();
 
             return (left, right);
         })
-        .collect();
-
-    return equations
-        .iter()
-        .filter(|eq| {
-            let variations = create_variations(eq.1.clone(), Vec::new(), concat);
-            return variations.contains(&eq.0);
-        })
+        .filter(|eq| create_variations(eq.1.clone(), Vec::new(), concat).contains(&eq.0))
         .map(|eq| eq.0)
         .sum();
 }
