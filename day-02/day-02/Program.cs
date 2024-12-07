@@ -31,7 +31,6 @@ static int CountSafeMeasurementsWithRemoving(IEnumerable<string> lines) => lines
     }
 
     return 0;
-
 });
 
 static bool IsSafe(int[] numbers, bool increasing)
