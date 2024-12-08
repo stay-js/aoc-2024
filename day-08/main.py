@@ -4,7 +4,7 @@ def get_antennas_and_boundaries(string: str):
     height = len(data)
     width = len(data[0])
 
-    antennas = {}
+    antennas: dict[tuple[int, int], str] = {}
 
     for y in range(height):
         for x in range(width):
@@ -28,14 +28,14 @@ def calculate_distances_and_create_antinodes(a: tuple[int, int], b: tuple[int, i
 
 def first_part(string: str) -> int:
     antennas, width, height = get_antennas_and_boundaries(string)
-    antinodes = set()
+    antinodes: set[tuple[int, int]] = set()
 
     for antenna in antennas:
         for pair in antennas:
             if antenna == pair or antennas[antenna] != antennas[pair]:
                 continue
 
-            dx, dy, antinode1, antinode2 = calculate_distances_and_create_antinodes(antenna, pair)
+            _, _, antinode1, antinode2 = calculate_distances_and_create_antinodes(antenna, pair)
 
             if 0 <= antinode1[0] < width and 0 <= antinode1[1] < height:
                 antinodes.add(antinode1)
@@ -47,7 +47,7 @@ def first_part(string: str) -> int:
 
 def second_part(string: str) -> int:
     antennas, width, height = get_antennas_and_boundaries(string)
-    antinodes = set()
+    antinodes: set[tuple[int, int]] = set()
 
     for antenna in antennas:
         antinodes.add(antenna)
