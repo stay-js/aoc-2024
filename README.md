@@ -13,7 +13,7 @@ My solutions to [Advent of Code 2024](https://adventofcode.com/2024) challenges.
 | Day 5  |  ⭐️   |  ⭐️   | TypeScript |
 | Day 6  |  ⭐️   |  ⭐️   |     Go     |
 | Day 7  |  ⭐️   |  ⭐️   |    Rust    |
-| Day 8  |   -    |   -    |            |
+| Day 8  |  ⭐️   |   -    |   Python   |
 | Day 9  |   -    |   -    |            |
 | Day 10 |   -    |   -    |            |
 | Day 11 |   -    |   -    |            |
