@@ -1,36 +1,28 @@
 use std::fs::read_to_string;
 
-#[derive(Clone, Copy)]
-enum Block {
-    File(u16),
-    FreeSpace,
+fn get_leftmost_free_space(disk: &Vec<Option<u16>>) -> Option<usize> {
+    return disk.iter().position(|item| matches!(item, None));
 }
 
-fn get_leftmost_free_space(disk: &Vec<Block>) -> Option<usize> {
-    return disk
-        .iter()
-        .position(|item| matches!(item, Block::FreeSpace));
-}
-
-fn get_rightmost_file(disk: &Vec<Block>) -> Option<usize> {
-    return disk.iter().rposition(|item| matches!(item, Block::File(_)));
+fn get_rightmost_file(disk: &Vec<Option<u16>>) -> Option<usize> {
+    return disk.iter().rposition(|item| matches!(item, Some(_)));
 }
 
 fn first_part(input: &str) -> u64 {
-    let mut index = 0;
+    let mut index: u16 = 0;
     let mut disk = Vec::new();
 
     for (i, c) in input.chars().enumerate() {
         let count = c.to_digit(10).unwrap() as usize;
 
         if i % 2 == 0 {
-            disk.extend(vec![Block::File(index); count]);
+            disk.extend(vec![Some(index); count]);
 
             index += 1;
             continue;
         }
 
-        disk.extend(vec![Block::FreeSpace; count]);
+        disk.extend(vec![None; count]);
     }
 
     while let (Some(a), Some(b)) = (get_leftmost_free_space(&disk), get_rightmost_file(&disk)) {
@@ -42,7 +34,7 @@ fn first_part(input: &str) -> u64 {
     }
 
     return disk.iter().enumerate().fold(0, |acc, (idx, item)| {
-        if let Block::File(file) = item {
+        if let Some(file) = item {
             return acc + *file as u64 * idx as u64;
         }
 
