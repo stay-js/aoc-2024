@@ -1,13 +1,5 @@
 use std::fs::read_to_string;
 
-fn get_leftmost_free_space(disk: &Vec<Option<u16>>) -> Option<usize> {
-    return disk.iter().position(|item| matches!(item, None));
-}
-
-fn get_rightmost_file(disk: &Vec<Option<u16>>) -> Option<usize> {
-    return disk.iter().rposition(|item| matches!(item, Some(_)));
-}
-
 fn first_part(input: &str) -> u64 {
     let mut index: u16 = 0;
     let mut disk = Vec::new();
@@ -25,12 +17,22 @@ fn first_part(input: &str) -> u64 {
         disk.extend(vec![None; count]);
     }
 
-    while let (Some(a), Some(b)) = (get_leftmost_free_space(&disk), get_rightmost_file(&disk)) {
-        if a > b {
-            break;
+    let mut leftmost_space = disk.iter().position(|item| matches!(item, None)).unwrap();
+    let mut rightmost_file = disk
+        .iter()
+        .rposition(|item| matches!(item, Some(_)))
+        .unwrap();
+
+    while leftmost_space < rightmost_file {
+        disk.swap(leftmost_space, rightmost_file);
+
+        while disk[leftmost_space].is_some() {
+            leftmost_space += 1;
         }
 
-        (disk[a], disk[b]) = (disk[b], disk[a]);
+        while disk[rightmost_file].is_none() {
+            rightmost_file -= 1;
+        }
     }
 
     return disk.iter().enumerate().fold(0, |acc, (idx, item)| {
