@@ -43,6 +43,71 @@ fn first_part(input: &str) -> u64 {
         return acc;
     });
 }
+fn second_part(input: &str) -> u64 {
+    let mut index: u16 = 0;
+    let mut disk = Vec::new();
+
+    for (i, c) in input.chars().enumerate() {
+        let count = c.to_digit(10).unwrap() as usize;
+
+        if i % 2 == 0 {
+            disk.extend(vec![Some((index, count)); count]);
+
+            index += 1;
+            continue;
+        }
+
+        disk.extend(vec![None; count]);
+    }
+
+    let mut files: Vec<_> = disk
+        .iter()
+        .filter_map(|item| item.as_ref().copied())
+        .collect();
+
+    files.dedup();
+
+    for file in files.into_iter().rev() {
+        let (_, length) = file;
+
+        let mut space_ptr = 0;
+        let mut space_length = 0;
+
+        while space_ptr + space_length < disk.len() - 1 {
+            space_ptr = disk
+                .iter()
+                .skip(space_ptr + space_length)
+                .position(|item| matches!(item, None))
+                .unwrap();
+
+            space_length = 1;
+
+            while disk[space_ptr + space_length].is_none() {
+                space_length += 1;
+            }
+
+            if space_length >= length {
+                break;
+            }
+        }
+
+        if space_length > length {
+            let file_idx = disk.iter().position(|item| item == &Some(file)).unwrap();
+
+            for i in 0..length {
+                disk.swap(file_idx + i, space_ptr + i);
+            }
+        }
+    }
+
+    return disk.iter().enumerate().fold(0, |acc, (idx, item)| {
+        if let Some((index, _)) = item {
+            return acc + *index as u64 * idx as u64;
+        }
+
+        return acc;
+    });
+}
 
 fn main() {
     let demo_input = read_to_string("demo-input.txt").unwrap();
@@ -50,7 +115,9 @@ fn main() {
 
     println!("demo-input:");
     println!("{}", first_part(&demo_input));
+    println!("{}", second_part(&demo_input));
 
     println!("\ninput:");
     println!("{}", first_part(&input));
+    println!("{}", second_part(&input));
 }
