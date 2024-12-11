@@ -9,12 +9,10 @@ fn first_part(input: &str) -> u64 {
 
         if i % 2 == 0 {
             disk.extend(vec![Some(index); count]);
-
             index += 1;
-            continue;
+        } else {
+            disk.extend(vec![None; count]);
         }
-
-        disk.extend(vec![None; count]);
     }
 
     let mut leftmost_space = disk.iter().position(|item| matches!(item, None)).unwrap();
@@ -43,6 +41,7 @@ fn first_part(input: &str) -> u64 {
         return acc;
     });
 }
+
 fn second_part(input: &str) -> u64 {
     let mut index: u16 = 0;
     let mut disk = Vec::new();
@@ -52,12 +51,10 @@ fn second_part(input: &str) -> u64 {
 
         if i % 2 == 0 {
             disk.extend(vec![Some((index, count)); count]);
-
             index += 1;
-            continue;
+        } else {
+            disk.extend(vec![None; count]);
         }
-
-        disk.extend(vec![None; count]);
     }
 
     let mut files: Vec<_> = disk
@@ -70,30 +67,22 @@ fn second_part(input: &str) -> u64 {
     for file in files.into_iter().rev() {
         let (_, length) = file;
 
+        let file_idx = disk.iter().position(|item| item == &Some(file)).unwrap();
+
         let mut space_ptr = 0;
         let mut space_length = 0;
 
-        while space_ptr + space_length < disk.len() - 1 {
-            space_ptr = disk
-                .iter()
-                .skip(space_ptr + space_length)
-                .position(|item| matches!(item, None))
-                .unwrap();
-
-            space_length = 1;
-
-            while disk[space_ptr + space_length].is_none() {
+        while space_ptr + space_length < disk.len() && space_length < length {
+            if disk[space_ptr + space_length].is_none() {
                 space_length += 1;
+                continue;
             }
 
-            if space_length >= length {
-                break;
-            }
+            space_ptr += space_length + 1;
+            space_length = 0;
         }
 
-        if space_length > length {
-            let file_idx = disk.iter().position(|item| item == &Some(file)).unwrap();
-
+        if space_ptr < file_idx && space_length >= length {
             for i in 0..length {
                 disk.swap(file_idx + i, space_ptr + i);
             }
