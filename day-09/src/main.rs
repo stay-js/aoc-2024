@@ -1,15 +1,15 @@
 use std::fs::read_to_string;
 
 fn first_part(input: &str) -> u64 {
-    let mut index: u16 = 0;
     let mut disk = Vec::new();
+    let mut id = 0;
 
     for (i, c) in input.chars().enumerate() {
         let count = c.to_digit(10).unwrap() as usize;
 
         if i % 2 == 0 {
-            disk.extend(vec![Some(index); count]);
-            index += 1;
+            disk.extend(vec![Some(id); count]);
+            id += 1;
         } else {
             disk.extend(vec![None; count]);
         }
@@ -33,69 +33,58 @@ fn first_part(input: &str) -> u64 {
         }
     }
 
-    return disk.iter().enumerate().fold(0, |acc, (idx, item)| {
-        if let Some(file) = item {
-            return acc + *file as u64 * idx as u64;
-        }
-
-        return acc;
-    });
+    return disk
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, &entry)| entry.map(|id| idx * id))
+        .sum::<usize>() as u64;
 }
 
 fn second_part(input: &str) -> u64 {
-    let mut index: u16 = 0;
     let mut disk = Vec::new();
+
+    let mut files = Vec::new();
+    let mut spaces = Vec::new();
+
+    let mut id = 0;
+    let mut index = 0;
 
     for (i, c) in input.chars().enumerate() {
         let count = c.to_digit(10).unwrap() as usize;
 
         if i % 2 == 0 {
-            disk.extend(vec![Some((index, count)); count]);
-            index += 1;
+            disk.extend(vec![Some(id); count]);
+            files.push((index, count));
+            id += 1;
         } else {
             disk.extend(vec![None; count]);
+            spaces.push((index, count));
+        }
+
+        index += count;
+    }
+
+    for &(file_start, file_length) in files.iter().rev() {
+        for space in spaces.iter_mut() {
+            let (space_start, space_length) = *space;
+
+            if space_length >= file_length && file_start > space_start {
+                for i in 0..file_length {
+                    disk.swap(space_start + i, file_start + i);
+                }
+
+                space.0 += file_length;
+                space.1 -= file_length;
+                break;
+            }
         }
     }
 
-    let mut files: Vec<_> = disk
+    return disk
         .iter()
-        .filter_map(|item| item.as_ref().copied())
-        .collect();
-
-    files.dedup();
-
-    for file in files.into_iter().rev() {
-        let (_, length) = file;
-
-        let file_idx = disk.iter().position(|item| item == &Some(file)).unwrap();
-
-        let mut space_ptr = 0;
-        let mut space_length = 0;
-
-        while space_ptr + space_length < disk.len() && space_length < length {
-            if disk[space_ptr + space_length].is_none() {
-                space_length += 1;
-                continue;
-            }
-
-            space_ptr += space_length + 1;
-            space_length = 0;
-        }
-
-        if space_ptr < file_idx && space_length >= length {
-            for i in 0..length {
-                disk.swap(file_idx + i, space_ptr + i);
-            }
-        }
-    }
-
-    return disk.iter().enumerate().fold(0, |acc, (idx, item)| {
-        if let Some((index, _)) = item {
-            return acc + *index as u64 * idx as u64;
-        }
-
-        return acc;
-    });
+        .enumerate()
+        .filter_map(|(idx, &entry)| entry.map(|id| idx * id))
+        .sum::<usize>() as u64;
 }
 
 fn main() {
