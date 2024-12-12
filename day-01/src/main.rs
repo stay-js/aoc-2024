@@ -4,12 +4,12 @@ fn get_lists(input: &String) -> (Vec<u32>, Vec<u32>) {
     let mut left: Vec<u32> = Vec::new();
     let mut right: Vec<u32> = Vec::new();
 
-    input.lines().for_each(|line| {
+    for line in input.lines() {
         let parts: Vec<&str> = line.split(' ').collect();
 
         left.push(parts.first().unwrap().parse().unwrap());
         right.push(parts.last().unwrap().parse().unwrap());
-    });
+    }
 
     left.sort();
     right.sort();
