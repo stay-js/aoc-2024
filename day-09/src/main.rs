@@ -40,6 +40,17 @@ fn first_part(input: &str) -> u64 {
         .sum::<usize>() as u64;
 }
 
+struct Block {
+    start: usize,
+    length: usize,
+}
+
+impl Block {
+    fn new(start: usize, length: usize) -> Self {
+        Self { start, length }
+    }
+}
+
 fn second_part(input: &str) -> u64 {
     let mut disk = Vec::new();
 
@@ -54,27 +65,25 @@ fn second_part(input: &str) -> u64 {
 
         if i % 2 == 0 {
             disk.extend(vec![Some(id); count]);
-            files.push((index, count));
+            files.push(Block::new(index, count));
             id += 1;
         } else {
             disk.extend(vec![None; count]);
-            spaces.push((index, count));
+            spaces.push(Block::new(index, count));
         }
 
         index += count;
     }
 
-    for &(file_start, file_length) in files.iter().rev() {
+    for file in files.iter().rev() {
         for space in spaces.iter_mut() {
-            let (space_start, space_length) = *space;
-
-            if space_length >= file_length && file_start > space_start {
-                for i in 0..file_length {
-                    disk.swap(space_start + i, file_start + i);
+            if space.length >= file.length && file.start > space.start {
+                for i in 0..file.length {
+                    disk.swap(space.start + i, file.start + i);
                 }
 
-                space.0 += file_length;
-                space.1 -= file_length;
+                space.start += file.length;
+                space.length -= file.length;
                 break;
             }
         }
