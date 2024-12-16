@@ -1,15 +1,12 @@
 use std::fs::read_to_string;
 
-fn get_next_position(direction: &char, x: usize, y: usize) -> (isize, isize) {
-    let x = x as isize;
-    let y = y as isize;
-
+fn get_next_position(direction: &char, x: usize, y: usize) -> Option<(usize, usize)> {
     return match direction {
-        '<' => (x - 1, y),
-        '>' => (x + 1, y),
-        '^' => (x, y - 1),
-        'v' => (x, y + 1),
-        _ => panic!("Invalid direction"),
+        '<' if x > 0 => Some((x - 1, y)),
+        '>' => Some((x + 1, y)),
+        '^' if y > 0 => Some((x, y - 1)),
+        'v' => Some((x, y + 1)),
+        _ => None,
     };
 }
 
@@ -35,54 +32,39 @@ fn first_part(input: &String) -> usize {
         }
     }
 
-    let height = matrix.len() as isize;
-    let width = matrix[0].len() as isize;
-
     for direction in directions.iter() {
-        let (nx, ny) = get_next_position(direction, x, y);
+        if let Some((nx, ny)) = get_next_position(direction, x, y) {
+            if matrix[ny][nx] == '#' {
+                continue;
+            }
 
-        if ny < 0 || ny >= height || nx < 0 || nx >= width {
-            continue;
+            if matrix[ny][nx] == '.' {
+                matrix[ny][nx] = '@';
+                matrix[y][x] = '.';
+                x = nx;
+                y = ny;
+                continue;
+            }
+
+            if let Some((mut bx, mut by)) = get_next_position(direction, nx, ny) {
+                while matrix[by][bx] == 'O' {
+                    if let Some((nbx, nby)) = get_next_position(direction, bx, by) {
+                        bx = nbx;
+                        by = nby;
+                    }
+                }
+
+                if matrix[by][bx] == '#' {
+                    continue;
+                }
+
+                matrix[ny][nx] = '@';
+                matrix[y][x] = '.';
+                matrix[by][bx] = 'O';
+                x = nx;
+                y = ny;
+            }
         }
-
-        let nx = nx as usize;
-        let ny = ny as usize;
-
-        if matrix[ny][nx] == '#' {
-            continue;
-        }
-
-        if matrix[ny][nx] == '.' {
-            matrix[ny][nx] = '@';
-            matrix[y][x] = '.';
-            x = nx;
-            y = ny;
-            continue;
-        }
-
-        let (mut bx, mut by) = get_next_position(direction, nx, ny);
-
-        while bx >= 0
-            && by >= 0
-            && by < height
-            && bx < width
-            && matrix[by as usize][bx as usize] == 'O'
-        {
-            (bx, by) = get_next_position(direction, bx as usize, by as usize);
-        }
-
-        let bx = bx as usize;
-        let by = by as usize;
-
-        if matrix[by][bx] == '#' {
-            continue;
-        }
-
-        matrix[ny][nx] = '@';
-        matrix[y][x] = '.';
-        matrix[by][bx] = 'O';
-        x = nx;
-        y = ny;
     }
 
     let mut sum = 0;
