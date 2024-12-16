@@ -11,9 +11,14 @@ type ClawMachine = {
   prize: Position;
 };
 
-function solveClawMachine(machine: ClawMachine, maxPresses: number) {
-  const { a, b, prize } = machine;
+function parsePosition(line: string, delimiter: string) {
+  const [, coords] = line.split(':');
+  const [x, y] = coords.split(',').map((part) => Number(part.split(delimiter)[1]));
 
+  return { x, y };
+}
+
+function solveClawMachine({ a, b, prize }: ClawMachine, maxPresses: number) {
   let minTokens: number | null = null;
 
   for (let i = 0; i <= maxPresses; i++) {
@@ -32,18 +37,10 @@ function solveClawMachine(machine: ClawMachine, maxPresses: number) {
   return minTokens;
 }
 
-function parsePosition(line: string, delimiter: string) {
-  const [, coords] = line.split(':');
-  const [x, y] = coords.split(',').map((part) => Number(part.split(delimiter)[1]));
-
-  return { x, y };
-}
-
 function firstPart(input: string) {
   const MAX_PRESSES = 100;
 
-  const machines = input
-    .trim()
+  return input
     .split('\n\n')
     .map((block) => {
       const [a, b, prize] = block.split('\n');
@@ -53,12 +50,8 @@ function firstPart(input: string) {
         b: parsePosition(b, '+'),
         prize: parsePosition(prize, '='),
       } satisfies ClawMachine;
-    });
-
-  return machines.reduce((acc, curr) => {
-    const tokens = solveClawMachine(curr, MAX_PRESSES);
-    return tokens === null ? acc : acc + tokens;
-  }, 0);
+    })
+    .reduce((acc, curr) => acc + (solveClawMachine(curr, MAX_PRESSES) ?? 0), 0);
 }
 
 console.log('demo-input:');
