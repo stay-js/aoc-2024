@@ -1,8 +1,9 @@
 use std::fs::read_to_string;
 
-type Position = (isize, isize);
+fn get_next_position(direction: &char, x: usize, y: usize) -> (isize, isize) {
+    let x = x as isize;
+    let y = y as isize;
 
-fn get_next_position(direction: &char, x: isize, y: isize) -> Position {
     return match direction {
         '<' => (x - 1, y),
         '>' => (x + 1, y),
@@ -28,8 +29,8 @@ fn first_part(input: &String) -> usize {
     for (i, row) in matrix.iter().enumerate() {
         for (j, cell) in row.iter().enumerate() {
             if cell == &'@' {
-                x = j as isize;
-                y = i as isize;
+                x = j;
+                y = i;
             }
         }
     }
@@ -44,13 +45,16 @@ fn first_part(input: &String) -> usize {
             continue;
         }
 
-        if matrix[ny as usize][nx as usize] == '#' {
+        let nx = nx as usize;
+        let ny = ny as usize;
+
+        if matrix[ny][nx] == '#' {
             continue;
         }
 
-        if matrix[ny as usize][nx as usize] == '.' {
-            matrix[ny as usize][nx as usize] = '@';
-            matrix[y as usize][x as usize] = '.';
+        if matrix[ny][nx] == '.' {
+            matrix[ny][nx] = '@';
+            matrix[y][x] = '.';
             x = nx;
             y = ny;
             continue;
@@ -60,20 +64,23 @@ fn first_part(input: &String) -> usize {
 
         while bx >= 0
             && by >= 0
-            && by < matrix.len() as isize
-            && bx < matrix[0].len() as isize
+            && by < height
+            && bx < width
             && matrix[by as usize][bx as usize] == 'O'
         {
-            (bx, by) = get_next_position(direction, bx, by);
+            (bx, by) = get_next_position(direction, bx as usize, by as usize);
         }
 
-        if matrix[by as usize][bx as usize] == '#' {
+        let bx = bx as usize;
+        let by = by as usize;
+
+        if matrix[by][bx] == '#' {
             continue;
         }
 
-        matrix[ny as usize][nx as usize] = '@';
-        matrix[y as usize][x as usize] = '.';
-        matrix[by as usize][bx as usize] = 'O';
+        matrix[ny][nx] = '@';
+        matrix[y][x] = '.';
+        matrix[by][bx] = 'O';
         x = nx;
         y = ny;
     }
