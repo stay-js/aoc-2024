@@ -17,14 +17,17 @@ Console.WriteLine(FirstPart(demoInput, DEMO_WIDTH, DEMO_HEIGHT, TIME));
 Console.WriteLine("\ninput:");
 Console.WriteLine(FirstPart(input, INPUT_WIDTH, INPUT_HEIGHT, TIME));
 
+var (seconds, grid) = SecondPart(input, INPUT_WIDTH, INPUT_HEIGHT);
+Console.WriteLine(seconds);
+
+Console.WriteLine("\nEaster egg:");
+PrintGrid(grid);
+
 static int FirstPart(string[] lines, int width, int height, int time)
 {
     var robots = lines.Select(x => new Robot(x)).ToList();
 
-    for (int _ = 0; _ < time; _++)
-    {
-        robots.ForEach(x => x.UpdatePosition(width, height));
-    }
+    robots.ForEach(x => x.UpdatePosition(time, width, height));
 
     int middleX = width / 2;
     int middleY = height / 2;
@@ -44,4 +47,45 @@ static int FirstPart(string[] lines, int width, int height, int time)
     }
 
     return q1 * q2 * q3 * q4;
+}
+
+static (int, int[,]) SecondPart(string[] lines, int width, int height)
+{
+    var robots = lines.Select(x => new Robot(x)).ToList();
+    int seconds = 0;
+
+    while (true)
+    {
+        int[,] grid = new int[height, width];
+        bool overlap = false;
+
+        foreach (var robot in robots)
+        {
+            var (x, y) = robot.PredictPosition(seconds, width, height);
+            grid[y, x]++;
+
+            if (grid[y, x] > 1)
+            {
+                overlap = true;
+                break;
+            }
+        }
+
+        if (!overlap) return (seconds, grid);
+
+        seconds++;
+    }
+}
+
+static void PrintGrid(int[,] grid)
+{
+    for (int i = 0; i < grid.GetLength(0); i++)
+    {
+        for (int j = 0; j < grid.GetLength(1); j++)
+        {
+            Console.Write(grid[i, j] > 0 ? "#" : ".");
+        }
+
+        Console.WriteLine();
+    }
 }

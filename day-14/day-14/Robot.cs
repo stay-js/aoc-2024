@@ -15,13 +15,16 @@ namespace day_14
             Velocity = ParsePosition(parts[1]);
         }
 
-        public void UpdatePosition(int width, int height)
+        public Position PredictPosition(int seconds, int width, int height)
         {
-            Position = (
-                (Position.x + Velocity.x + width) % width,
-                (Position.y + Velocity.y + height) % height
-            );
+            return (
+                ((Position.x + seconds * Velocity.x) % width + width) % width,
+                ((Position.y + seconds * Velocity.y) % height + height) % height
+                );
         }
+
+        public void UpdatePosition(int time, int width, int height) =>
+            Position = PredictPosition(time, width, height);
 
         private static Position ParsePosition(string input)
         {
