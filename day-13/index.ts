@@ -11,35 +11,31 @@ type ClawMachine = {
   prize: Position;
 };
 
-function parsePosition(line: string, delimiter: string) {
+function parsePosition(line: string, delimiter: string, offset: number = 0) {
   const [, coords] = line.split(':');
-  const [x, y] = coords.split(',').map((part) => Number(part.split(delimiter)[1]));
+  const [x, y] = coords.split(',').map((part) => Number(part.split(delimiter)[1]) + offset);
 
   return { x, y };
 }
 
-function solveClawMachine({ a, b, prize }: ClawMachine, maxPresses: number) {
-  let minTokens: number | null = null;
+function solveClawMachine({ a, b, prize }: ClawMachine) {
+  // Cramer's rule + ChatGPT's help
+  const px = prize.x;
+  const py = prize.y;
 
-  for (let i = 0; i <= maxPresses; i++) {
-    for (let j = 0; j <= maxPresses; j++) {
-      const x = i * a.x + j * b.x;
-      const y = i * a.y + j * b.y;
+  const d = a.x * b.y - a.y * b.x;
+  const di = px * b.y - py * b.x;
+  const dj = py * a.x - px * a.y;
 
-      if (x === prize.x && y === prize.y) {
-        const tokens = 3 * i + j;
+  if (d === 0 || di % d !== 0 || dj % d !== 0) return null;
 
-        if (minTokens === null || tokens < minTokens) minTokens = tokens;
-      }
-    }
-  }
+  const i = di / d;
+  const j = dj / d;
 
-  return minTokens;
+  return 3 * i + j;
 }
 
-function firstPart(input: string) {
-  const MAX_PRESSES = 100;
-
+function calculateTokensSpent(input: string, offset: number) {
   return input
     .split('\n\n')
     .map((block) => {
@@ -48,16 +44,18 @@ function firstPart(input: string) {
       return {
         a: parsePosition(a, '+'),
         b: parsePosition(b, '+'),
-        prize: parsePosition(prize, '='),
+        prize: parsePosition(prize, '=', offset),
       } satisfies ClawMachine;
     })
-    .reduce((acc, curr) => acc + (solveClawMachine(curr, MAX_PRESSES) ?? 0), 0);
+    .reduce((acc, curr) => acc + (solveClawMachine(curr) ?? 0), 0);
 }
+
+const firstPart = (input: string) => calculateTokensSpent(input, 0);
+const secondPart = (input: string) => calculateTokensSpent(input, 10_000_000_000_000);
 
 console.log('demo-input:');
 console.log(firstPart(demoInput));
-// console.log(secondPart(demoInput));
 
 console.log('\ninput:');
 console.log(firstPart(input));
-// console.log(secondPart(input));
+console.log(secondPart(input));
