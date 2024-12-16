@@ -20,7 +20,7 @@ My solutions to [Advent of Code 2024](https://adventofcode.com/2024) challenges.
 | Day 12 |  ⭐️   |   -    |    Rust    |
 | Day 13 |  ⭐️   |  ⭐️   | TypeScript |
 | Day 14 |  ⭐️   |  ⭐️   |     C#     |
-| Day 15 |   -    |   -    |            |
+| Day 15 |  ⭐️   |   -    |    Rust    |
 | Day 16 |   -    |   -    |            |
 | Day 17 |   -    |   -    |            |
 | Day 18 |   -    |   -    |            |
