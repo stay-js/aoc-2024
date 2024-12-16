@@ -8,8 +8,8 @@ const int DEMO_HEIGHT = 7;
 const int INPUT_WIDTH = 101;
 const int INPUT_HEIGHT = 103;
 
-string demoInput = await File.ReadAllTextAsync("demo-input.txt");
-string input = await File.ReadAllTextAsync("input.txt");
+string[] demoInput = await File.ReadAllLinesAsync("demo-input.txt");
+string[] input = await File.ReadAllLinesAsync("input.txt");
 
 Console.WriteLine("demo-input:");
 Console.WriteLine(FirstPart(demoInput, DEMO_WIDTH, DEMO_HEIGHT, TIME));
@@ -17,9 +17,9 @@ Console.WriteLine(FirstPart(demoInput, DEMO_WIDTH, DEMO_HEIGHT, TIME));
 Console.WriteLine("\ninput:");
 Console.WriteLine(FirstPart(input, INPUT_WIDTH, INPUT_HEIGHT, TIME));
 
-static int FirstPart(string input, int width, int height, int time)
+static int FirstPart(string[] lines, int width, int height, int time)
 {
-    var robots = input.Split('\n').Select(x => new Robot(x)).ToList();
+    var robots = lines.Select(x => new Robot(x)).ToList();
 
     for (int _ = 0; _ < time; _++)
     {
